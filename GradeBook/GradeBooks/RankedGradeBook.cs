@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GradeBook.GradeBooks
@@ -15,28 +16,23 @@ namespace GradeBook.GradeBooks
         {
             if (Students.Count < 5)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Ranked-grading requires a minimum of 5 students to work.");
             }
 
-            int position = 0;
+            var threshold = (int)Math.Ceiling(Students.Count * 0.2);
 
-            foreach (var student in Students)
-            {
-                if (averageGrade > student.AverageGrade)
-                {
-                    position++;
-                }
-            }
+            var grades = Students
+                .OrderByDescending(x => x.AverageGrade)
+                .Select(x => x.AverageGrade)
+                .ToList();
 
-            var percent = position / Students.Count;
-
-            if (percent > 0.8)
+            if (grades[threshold - 1] <= averageGrade)
                 return 'A';
-            else if (percent > 0.6)
+            else if (grades[threshold * 2] <= averageGrade)
                 return 'B';
-            else if (percent > 0.4)
+            else if (grades[threshold * 4] <= averageGrade)
                 return 'C';
-            else if (percent > 0.2)
+            else if (grades[threshold * 6] <= averageGrade)
                 return 'D';
             else
                 return 'F';
